@@ -22,8 +22,8 @@ router.get('/ngrams', function(req, res) {
 });
 router.get('/check', function(req, res) {
     word = req.query["word"]
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(models.ngram.findWord(word)));
+    result = models.ngram.findWord(word);
+    res.send(JSON.stringify(result));
 })
 
 module.exports = router;

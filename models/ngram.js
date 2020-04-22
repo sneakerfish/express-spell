@@ -1,15 +1,5 @@
 'use strict';
-
-function get_ngrams(word) {
-    var data = [];
-    const newword = '*' + word + '*';
-    for (var i=0;i<newword.length-2;i++) {
-        data.push(newword.substring(i,i+3));
-    }
-    return data;
-}
-
-
+var get_ngrams = require("../get_ngrams");
 
 module.exports = (sequelize, DataTypes) => {
     var NGram = sequelize.define('ngram', {
@@ -35,19 +25,22 @@ module.exports = (sequelize, DataTypes) => {
         });
     };
 
-    NGram.findWord = function(models, word) {
-        this.findAll({
-            where: {
-                ngram: get_ngrams(word)
-            },
-        }).then(function(ngram) {
-            var data = [];
-            for (const n in ngram) {
-                console.log(ngram[n]);
-                data.push(ngram[n]);
-            }
-            return data;
-        });
+    NGram.findWord = function(word) {
+        sequelize.query("select distinct words.spelling, levenshtein(:word, words.spelling) lev " +
+                                    "from ngrams, words where ngrams.word_id = words.id and " +
+                                    "ngrams.ngram in (:list) order by lev limit 10",
+                                    { replacements: { word: word, list: get_ngrams.data(word) },
+                                      type: sequelize.QueryTypes.SELECT }
+                       ).then(function(ngram) {
+                           var data = [];
+                           for (const n in ngram) {
+                               data.push(ngram[n]);
+                           }
+                           console.log("done");
+                           return data;
+                       }).catch(function (reason) {
+                           return reason;
+                       });
     };
 
     return NGram;
