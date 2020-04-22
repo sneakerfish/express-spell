@@ -1,16 +1,7 @@
 var models  = require('../models');
 var express = require('express');
 var router  = express.Router();
-
-function get_ngrams(word) {
-    data = [];
-    const newword = '*' + word + '*';
-    for (i=0;i<newword.length-2;i++) {
-        data.push(newword.substring(i,i+3));
-    }
-    return data;
-}
-
+var get_ngrams = require('../get_ngrams');
 
 router.get('/', function(req, res) {
     models.ngram.findAll({
@@ -27,7 +18,12 @@ router.get('/', function(req, res) {
 });
 router.get('/ngrams', function(req, res) {
     console.log(req.query);
-    res.send(JSON.stringify(get_ngrams(req.query["word"])));
+    res.send(JSON.stringify(get_ngrams.data(req.query["word"])));
 });
+router.get('/check', function(req, res) {
+    word = req.query["word"]
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(models.ngram.findWord(word)));
+})
 
 module.exports = router;
