@@ -26,17 +26,17 @@ module.exports = (sequelize, DataTypes) => {
     };
 
     NGram.findWord = function(word) {
-        sequelize.query("select distinct words.spelling, levenshtein(:word, words.spelling) lev " +
-                                    "from ngrams, words where ngrams.word_id = words.id and " +
-                                    "ngrams.ngram in (:list) order by lev limit 10",
-                                    { replacements: { word: word, list: get_ngrams.data(word) },
-                                      type: sequelize.QueryTypes.SELECT }
+       return sequelize.query("select distinct words.spelling, levenshtein(:word, words.spelling) lev " +
+                        "from ngrams, words where ngrams.word_id = words.id and " +
+                        "ngrams.ngram in (:list) order by lev limit 10",
+                        { replacements: { word: word, list: get_ngrams.data(word) },
+                          type: sequelize.QueryTypes.SELECT }
                        ).then(function(ngram) {
                            var data = [];
                            for (const n in ngram) {
                                data.push(ngram[n]);
                            }
-                           console.log("done");
+                           console.log(data);
                            return data;
                        }).catch(function (reason) {
                            return reason;
