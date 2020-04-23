@@ -43,5 +43,21 @@ module.exports = (sequelize, DataTypes) => {
                        });
     };
 
+
+    NGram.findLev = function(worda, wordb) {
+        console.log("worda: ", worda, " wordb: ", wordb);
+        return sequelize.query("select levenshtein(:worda, :wordb) lev ",
+                               { replacements: { worda: worda, wordb: wordb },
+                                 type: sequelize.QueryTypes.SELECT }
+                              ).then(function(lev_value) {
+                                  for (const n in lev_value) {
+                                      return lev_value[n]["lev"];
+                                  }
+                       }).catch(function (reason) {
+                           return reason;
+                       });
+    };
+
+
     return NGram;
 };
