@@ -17,7 +17,6 @@ router.get('/', function(req, res) {
     });
 });
 router.get('/ngrams', function(req, res) {
-    console.log(req.query);
     res.send(JSON.stringify(get_ngrams.data(req.query["word"])));
 });
 router.get('/check', function(req, res) {

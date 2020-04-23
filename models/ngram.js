@@ -36,7 +36,6 @@ module.exports = (sequelize, DataTypes) => {
                            for (const n in ngram) {
                                data.push(ngram[n]);
                            }
-                           console.log(data);
                            return data;
                        }).catch(function (reason) {
                            return reason;
@@ -45,7 +44,6 @@ module.exports = (sequelize, DataTypes) => {
 
 
     NGram.findLev = function(worda, wordb) {
-        console.log("worda: ", worda, " wordb: ", wordb);
         return sequelize.query("select levenshtein(:worda, :wordb) lev ",
                                { replacements: { worda: worda, wordb: wordb },
                                  type: sequelize.QueryTypes.SELECT }
