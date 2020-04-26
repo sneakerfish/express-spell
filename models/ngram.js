@@ -5,12 +5,13 @@ module.exports = (sequelize, DataTypes) => {
     var NGram = sequelize.define('ngram', {
         id: {
             type: DataTypes.INTEGER,
+            autoIncrement: true,
             primaryKey: true
         },
         ngram: {
             type: DataTypes.STRING,
             allowNull: false
-        }
+        },
     }, {
         timestamps: false
     });
