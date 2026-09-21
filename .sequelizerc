@@ -1,0 +1,8 @@
+const path = require('path');
+
+// Tell sequelize-cli where things live in this project.
+module.exports = {
+  config: path.resolve('config', 'config.js'),
+  'models-path': path.resolve('models'),
+  'migrations-path': path.resolve('migrations'),
+};
