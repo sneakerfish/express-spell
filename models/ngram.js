@@ -1,62 +1,54 @@
 'use strict';
-var get_ngrams = require("../get_ngrams");
+
+const { QueryTypes } = require('sequelize');
+const { getNgrams } = require('../get_ngrams');
 
 module.exports = (sequelize, DataTypes) => {
-    var NGram = sequelize.define('ngram', {
-        id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
-            primaryKey: true
-        },
-        ngram: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-    }, {
-        timestamps: false
+  const NGram = sequelize.define('ngram', {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    ngram: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  }, {
+    timestamps: false,
+  });
+
+  NGram.associate = (models) => {
+    NGram.belongsTo(models.word, {
+      onDelete: 'CASCADE',
+      foreignKey: {
+        name: 'word_id',
+        allowNull: false,
+      },
     });
+  };
 
-    NGram.associate = function (models) {
-        models.ngram.belongsTo(models.word, {
-            onDelete: "CASCADE",
-            foreignKey: {
-                name: 'word_id',
-                allowNull: false
-            }
-        });
-    };
+  // Find the 10 dictionary words that share an n-gram with `word`,
+  // closest first by Levenshtein distance.
+  NGram.findWord = (word) => sequelize.query(
+    'SELECT DISTINCT words.spelling, levenshtein(:word, words.spelling) AS lev ' +
+    'FROM ngrams JOIN words ON ngrams.word_id = words.id ' +
+    'WHERE ngrams.ngram IN (:list) ' +
+    'ORDER BY lev LIMIT 10',
+    {
+      replacements: { word, list: getNgrams(word) },
+      type: QueryTypes.SELECT,
+    },
+  );
 
-    NGram.findWord = function(word) {
-       return sequelize.query("select distinct words.spelling, levenshtein(:word, words.spelling) lev " +
-                        "from ngrams, words where ngrams.word_id = words.id and " +
-                        "ngrams.ngram in (:list) order by lev limit 10",
-                        { replacements: { word: word, list: get_ngrams.data(word) },
-                          type: sequelize.QueryTypes.SELECT }
-                       ).then(function(ngram) {
-                           var data = [];
-                           for (const n in ngram) {
-                               data.push(ngram[n]);
-                           }
-                           return data;
-                       }).catch(function (reason) {
-                           return reason;
-                       });
-    };
+  // Levenshtein (edit) distance between two strings, computed by Postgres.
+  NGram.findLev = async (worda, wordb) => {
+    const [row] = await sequelize.query('SELECT levenshtein(:worda, :wordb) AS lev', {
+      replacements: { worda, wordb },
+      type: QueryTypes.SELECT,
+    });
+    return row.lev;
+  };
 
-
-    NGram.findLev = function(worda, wordb) {
-        return sequelize.query("select levenshtein(:worda, :wordb) lev ",
-                               { replacements: { worda: worda, wordb: wordb },
-                                 type: sequelize.QueryTypes.SELECT }
-                              ).then(function(lev_value) {
-                                  for (const n in lev_value) {
-                                      return lev_value[n]["lev"];
-                                  }
-                       }).catch(function (reason) {
-                           return reason;
-                       });
-    };
-
-
-    return NGram;
+  return NGram;
 };

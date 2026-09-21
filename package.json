@@ -1,25 +1,33 @@
 {
-    "name": "express-spell-redo",
-    "version": "0.0.0",
+    "name": "express-spell",
+    "version": "0.1.0",
     "private": true,
+    "description": "Spell-checking demo using trigram lookup and Levenshtein distance in PostgreSQL",
+    "engines": {
+        "node": ">=18"
+    },
     "scripts": {
-        "start": "node ./bin/www"
+        "start": "node ./bin/www",
+        "db:migrate": "sequelize-cli db:migrate",
+        "db:seed": "node ./bin/seed_database.js",
+        "test": "node --test"
     },
     "dependencies": {
-        "acorn": ">=5.7.4",
-        "clean-css": ">=4.1.11",
-        "constantinople": ">=3.1.1",
-        "cookie-parser": "~1.4.4",
-        "debug": "~2.6.9",
-        "express": "~4.16.1",
-        "http-errors": "~1.6.3",
-        "jade": "~1.11.0",
-        "kind-of": ">=6.0.3",
-        "morgan": "~1.9.1",
-        "minimist": ">=0.2.1",
-        "pg": "^8.0.0",
-        "pg-hstore": "^2.3.3",
-        "sequelize": "^5.21.6",
-        "sequelize-cli": "^5.5.1"
+        "cookie-parser": "^1.4.7",
+        "debug": "^4.4.3",
+        "express": "^5.2.1",
+        "http-errors": "^2.0.1",
+        "morgan": "^1.12.1",
+        "pg": "^8.23.0",
+        "pg-hstore": "^2.3.4",
+        "sequelize": "^6.37.8"
+    },
+    "devDependencies": {
+        "sequelize-cli": "^6.6.5"
+    },
+    "overrides": {
+        "sequelize": {
+            "uuid": "^11.1.1"
+        }
     }
 }
